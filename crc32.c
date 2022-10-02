@@ -110,6 +110,17 @@ const uint32_t crc32_tab[] = {
  *		return crc ^ ~0U;
  *	}
  */
+uint32_t crc32(const unsigned char *buf, size_t size)
+{
+	const uint8_t *p = buf;
+	uint32_t crc;
+
+	crc = ~0U;
+	while (size--)
+		crc = crc32_tab[(crc ^ *p++) & 0xFF] ^ (crc >> 8);
+	return crc ^ ~0U;
+}
+
 
 /* CRC32C routines, these use a different polynomial */
 /*****************************************************************/

@@ -9,6 +9,8 @@
  */
 uint32_t calculate_crc32c(uint32_t crc, const unsigned char *buf, unsigned int len);
 
+uint32_t crc32(const void *buf, size_t size);
+
 /**
  * Compute the CRC-32 of the bootloader control struct.
  *
@@ -21,5 +23,5 @@ uint32_t calculate_crc32c(uint32_t crc, const unsigned char *buf, unsigned int l
  */
 static uint32_t ab_control_compute_crc(struct bootloader_control *abc)
 {
-	return calculate_crc32c(0, (void *)abc, offsetof(typeof(*abc), crc32_le));
+	return crc32((void *)abc, offsetof(typeof(*abc), crc32_le));
 }

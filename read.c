@@ -1,4 +1,5 @@
 #include "bm.h"
+#include "crc.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -25,4 +26,7 @@ int main() {
     printf("%d\n", sm.successful_boot);
     printf("%d\n", sm.verity_corrupted);
   }
+  printf("=======\n");
+  printf("%d\n", bc->crc32_le);
+  printf("%d\n", ab_control_compute_crc(bc));
 }
