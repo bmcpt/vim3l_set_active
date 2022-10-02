@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int main() {
-  FILE* in = fopen("t.img", "r");
+int main(int argc, char** argv) {
+  FILE* in = fopen(argv[1], "r");
   fseek(in, 0L, SEEK_END);
   int sz = ftell(in);
   fseek(in, 0L, SEEK_SET);

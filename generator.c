@@ -5,32 +5,34 @@
 #include <unistd.h>
 #include <string.h>
 
-int main() {
-  FILE* in = fopen("misc.img", "r");
-  fseek(in, 0L, SEEK_END);
-  int sz = ftell(in);
-  fseek(in, 0L, SEEK_SET);
-  char data[sz];
-  fread(data, 1, sz, in);
-  fclose(in);
+#define SIZE 524288
+#define OFF 2048
 
-  char zeros[65536];
-  memset(zeros, 0, 65536);
+int main(int argc, char** argv) {
+  char data[SIZE];
+  memset(data, 0, SIZE);
 
-  struct bootloader_control* bc = (struct bootloader_control*) (data + 2048);
+  struct bootloader_control* bc = (struct bootloader_control*) (data + OFF);
+  char slot = argv[1][0];
+  int active_index = slot - 'a';
+  int inactive_index = 1 - active_index;
 
-  bc->slot_suffix[0] = 'a';
-  bc->slot_info[0].priority = 15;
-  bc->slot_info[0].tries_remaining = 7;
-  bc->slot_info[0].successful_boot = 1;
-  bc->slot_info[0].verity_corrupted = 0;
-  bc->slot_info[1].priority = 15;
-  bc->slot_info[1].tries_remaining = 0;
-  bc->slot_info[1].successful_boot = 0;
-  bc->slot_info[1].verity_corrupted = 0;
+  bc->slot_suffix[0] = slot;
+  bc->magic = BOOT_CTRL_MAGIC;
+  bc->version = BOOT_CTRL_VERSION;
+  bc->nb_slot = 2;
+  bc->recovery_tries_remaining = 0;
+  bc->slot_info[active_index].priority = 15;
+  bc->slot_info[active_index].tries_remaining = 7;
+  bc->slot_info[active_index].successful_boot = 1;
+  bc->slot_info[active_index].verity_corrupted = 0;
+  bc->slot_info[inactive_index].priority = 15;
+  bc->slot_info[inactive_index].tries_remaining = 0;
+  bc->slot_info[inactive_index].successful_boot = 0;
+  bc->slot_info[inactive_index].verity_corrupted = 0;
   bc->crc32_le = ab_control_compute_crc(bc);
 
   FILE* fp = fopen("out.img", "w+");
-  fwrite(data, 1, sz, fp);
+  fwrite(data, 1, SIZE, fp);
   fclose(fp);
 }
